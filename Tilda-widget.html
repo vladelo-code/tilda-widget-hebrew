@@ -1,0 +1,645 @@
+<!--Плагин для слабослышащих на Tilda на иврите-->
+<!--Разработчик: t.me/vladelo-->
+<!--https://github.com/vladelo777-->
+
+<style>
+    .t123:has([aria-expanded="true"]) .accessibility-panel {
+        right: 0;
+    }
+
+    #accessibility-title {
+        margin-bottom: 20px;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .access {
+        cursor: pointer;
+    }
+
+    .option-group:has(#reset-accessibility) {
+        margin-bottom: 0;
+    }
+
+    #decrease-font {
+        font-size: 10px;
+    }
+
+    #increase-font {
+        font-size: 16px;
+    }
+
+    .accessibility-panel {
+        position: fixed;
+        top: 50%;
+
+        right: -300px;
+        width: 250px;
+        max-height: 100vh;
+        overflow-y: auto;
+        line-height: 20px;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        background-color: #ffffff;
+        color: #000000;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+        padding: 15px;
+        transition: right 0.3s ease;
+        z-index: 9999999;
+        border-radius: 10px 0 0 10px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+        transform: translateY(-50%);
+    }
+
+
+    .accessibility-panel::-webkit-scrollbar {
+        display: none;
+    }
+
+    .accessibility-panel.open {
+        right: 0;
+    }
+
+    .accessibility-toggle {
+        position: fixed;
+        top: 100px;
+        right: 0;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 5px 0 0 5px;
+        padding: 10px;
+        cursor: pointer;
+        z-index: 10000;
+    }
+
+    .accessibility-toggle:focus {
+        outline: 3px solid #ff6b00;
+    }
+
+    .option-group {
+        width: 100%;
+    }
+
+    .option-group-title {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .color-scheme-btn {
+        display: block;
+        width: 100%;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: left;
+        border: 2px solid transparent;
+        box-sizing: border-box;
+    }
+
+    .color-scheme-btn:focus {
+        outline: 2px solid #3498db;
+    }
+
+    .color-scheme-btn.active {
+        border-color: #3498db;
+    }
+
+    .black-on-white {
+        background-color: white;
+        color: black;
+    }
+
+    .white-on-black {
+        background-color: black;
+        color: white;
+    }
+
+    .brown-on-beige {
+        background-color: #f5f5dc;
+        color: #8b4513;
+    }
+
+    .dark-blue-on-blue {
+        background-color: #add8e6;
+        color: #00008b;
+    }
+
+    .font-size-controls {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+
+    .font-size-btn {
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        flex-grow: 1;
+        margin: 0 5px;
+        text-align: center;
+    }
+
+    .font-size-btn:first-child {
+        margin-left: 0;
+    }
+
+    .font-size-btn:last-child {
+        margin-right: 0;
+    }
+
+    .font-size-btn:hover {
+        background-color: #e0e0e0;
+    }
+
+    .font-size-btn:focus {
+        outline: 2px solid #3498db;
+    }
+
+    .font-size-btn.active {
+        border: 2px solid #3498db;
+    }
+
+    .filter-btn {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-align: left;
+        background-color: #f0f0f0;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+    }
+
+    .filter-btn.active {
+        background-color: #e0e0e0;
+        border-color: #3498db;
+    }
+
+    .filter-btn:focus {
+        outline: 2px solid #3498db;
+    }
+
+    .filter-icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        background-color: #ddd;
+        border-radius: 3px;
+        flex-shrink: 0;
+    }
+
+    #reset-accessibility {
+        width: 100%;
+        padding: 10px;
+        background-color: #f44336;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        box-sizing: border-box;
+    }
+
+    #reset-accessibility:hover {
+        background-color: #d32f2f;
+    }
+
+    #reset-accessibility:focus {
+        outline: 2px solid #ff6b00;
+    }
+
+    .large-cursor {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='22' fill='transparent' stroke='black' stroke-width='3'/%3E%3Ccircle cx='24' cy='24' r='8' fill='black'/%3E%3C/svg%3E"), auto !important;
+    }
+
+    body.accessibility-white-on-black.large-cursor {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='22' fill='transparent' stroke='white' stroke-width='3'/%3E%3Ccircle cx='24' cy='24' r='8' fill='white'/%3E%3C/svg%3E"), auto !important;
+    }
+
+    body.accessibility-brown-on-beige.large-cursor {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='22' fill='transparent' stroke='%238b4513' stroke-width='3'/%3E%3Ccircle cx='24' cy='24' r='8' fill='%238b4513'/%3E%3C/svg%3E"), auto !important;
+    }
+
+    .large-cursor-high-contrast {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='22' fill='transparent' stroke='black' stroke-width='3'/%3E%3Ccircle cx='24' cy='24' r='22' fill='transparent' stroke='white' stroke-width='1.5'/%3E%3Ccircle cx='24' cy='24' r='8' fill='black'/%3E%3Ccircle cx='24' cy='24' r='8' fill='black' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E"), auto !important;
+    }
+
+    body.accessibility-black-on-white {
+        background-color: #fff !important;
+        color: #000 !important;
+    }
+
+    body.accessibility-black-on-white *:not(.access .tn-atom):not(.accessibility-toggle):not(.accessibility-toggle svg), body.accessibility-black-on-white input::placeholder {
+        background-color: #fff !important;
+        color: #000 !important;
+        border-color: #000 !important;
+    }
+
+    body.accessibility-black-on-white a {
+        color: #0000ff !important;
+        text-decoration: underline !important;
+    }
+
+    body.accessibility-white-on-black {
+        background-color: #000 !important;
+        color: #fff !important;
+    }
+
+    body.accessibility-white-on-black *:not(.access .tn-atom):not(.accessibility-toggle):not(.accessibility-toggle svg), body.accessibility-white-on-black input::placeholder {
+        background-color: #000 !important;
+        color: #fff !important;
+        border-color: #fff !important;
+    }
+
+    body.accessibility-white-on-black a {
+        color: #ffff00 !important;
+        text-decoration: underline !important;
+    }
+
+    body.accessibility-brown-on-beige {
+        background-color: #f5f5dc !important;
+        color: #8b4513 !important;
+    }
+
+    body.accessibility-brown-on-beige *:not(.access .tn-atom):not(.accessibility-toggle):not(.accessibility-toggle svg), body.accessibility-brown-on-beige input::placeholder {
+        background-color: #f5f5dc !important;
+        color: #8b4513 !important;
+        border-color: #8b4513 !important;
+    }
+
+    body.accessibility-brown-on-beige a {
+        color: #a52a2a !important;
+        text-decoration: underline !important;
+    }
+
+    body.accessibility-dark-blue-on-blue {
+        background-color: #add8e6 !important;
+        color: #00008b !important;
+    }
+
+    body.accessibility-dark-blue-on-blue *:not(.access .tn-atom):not(.accessibility-toggle):not(.accessibility-toggle svg), body.accessibility-dark-blue-on-blue input::placeholder {
+        background-color: #add8e6 !important;
+        color: #00008b !important;
+        border-color: #00008b !important;
+    }
+
+    body.accessibility-dark-blue-on-blue a {
+        color: #0000cd !important;
+        text-decoration: underline !important;
+    }
+
+    body.accessibility-hide-images img {
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+
+    body.accessibility-hide-images [style*="background-image: url"] {
+        background-image: none !important;
+    }
+
+    .accessibility-highlight-text {
+        background-color: yellow !important;
+        color: black !important;
+    }
+
+    html body.accessibility-black-on-white [data-elem-type="text"],
+    html body.accessibility-black-on-white [data-elem-type="text"] * {
+        background-color: transparent !important;
+    }
+
+    html body.accessibility-white-on-black [data-elem-type="text"],
+    html body.accessibility-white-on-black [data-elem-type="text"] * {
+        background-color: transparent !important;
+    }
+
+    html body.accessibility-brown-on-beige [data-elem-type="text"],
+    html body.accessibility-brown-on-beige [data-elem-type="text"] * {
+        background-color: transparent !important;
+    }
+
+    html body.accessibility-dark-blue-on-blue [data-elem-type="text"],
+    html body.accessibility-dark-blue-on-blue [data-elem-type="text"] * {
+        background-color: transparent !important;
+    }
+
+
+</style>
+<button class="accessibility-toggle" aria-label="Open accessibility options" aria-expanded="false">
+    <svg width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M7.709 5.834a2.292 2.292 0 1 1 4.583 0 2.292 2.292 0 0 1-4.583 0zm2.292-1.042a1.042 1.042 0 1 0 0 2.083 1.042 1.042 0 0 0 0-2.083z"
+              fill="#fff"/>
+        <path d="M4.425 8.09a.625.625 0 0 1 .82-.333v.001l.005.003.022.009.092.037a21.644 21.644 0 0 0 1.554.555c.982.309 2.156.596 3.082.596.926 0 2.1-.287 3.082-.596a22.507 22.507 0 0 0 1.645-.592l.023-.01.005-.002a.625.625 0 0 1 .49 1.15l-.004.002-.009.003-.026.012-.103.042c-.541.216-1.09.413-1.646.588-.824.258-1.864.533-2.832.623v1.033c0 .358.103.71.297 1.013l2.104 3.271a.623.623 0 0 1-.415.954.626.626 0 0 1-.637-.277L10 13.1l-1.975 3.072a.624.624 0 1 1-1.05-.677l2.102-3.27c.195-.303.298-.655.298-1.015v-1.033c-.968-.09-2.008-.363-2.833-.622a23.337 23.337 0 0 1-1.748-.63l-.027-.012-.008-.003h-.003a.625.625 0 0 1-.331-.82z"
+              fill="#fff"/>
+        <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M1.041 10a8.958 8.958 0 1 1 17.917 0A8.958 8.958 0 0 1 1.04 10zm8.958-7.708a7.708 7.708 0 1 0 0 15.417 7.708 7.708 0 0 0 0-15.417z"
+              fill="#fff"/>
+    </svg>
+</button>
+<div class="accessibility-panel" role="dialog" aria-labelledby="accessibility-title">
+    <div id="accessibility-title">הגדרות לקויי ראייה</div>
+    <div class="option-group">
+        <div class="option-group-title">ערכת צבעים</div>
+        <button id="black-on-white" class="color-scheme-btn black-on-white" aria-label="Черным по белому">
+            שחור על לבן
+        </button>
+        <button id="white-on-black" class="color-scheme-btn white-on-black" aria-label="Белым по черному">
+            לבן על שחור
+        </button>
+        <button id="brown-on-beige" class="color-scheme-btn brown-on-beige" aria-label="Коричневым по бежевому">
+            חום על בז'
+        </button>
+        <button id="dark-blue-on-blue" class="color-scheme-btn dark-blue-on-blue" aria-label="Темно-синим по синему">
+            כחול כהה על ידי כחול
+        </button>
+    </div>
+    <div class="option-group">
+        <div class="option-group-title">תמונות</div>
+        <div class="font-size-controls">
+            <button id="show-images" class="font-size-btn" aria-label="Показать">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                    <path d="M4 19l5-5 3 3 5-5 3 3" stroke="currentColor" stroke-width="2"/>
+                </svg>
+            </button>
+            <button id="hide-images" class="font-size-btn" aria-label="Скрыть">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor"/>
+                    <path d="M4 19l5-5 3 3 5-5 3 3" stroke="currentColor" stroke-width="2"/>
+                    <line x1="3" y1="21" x2="21" y2="3" stroke="red" stroke-width="2"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="option-group">
+        <div class="option-group-title">גודל טקסט</div>
+        <div class="font-size-controls">
+            <button id="decrease-font" class="font-size-btn" aria-label="Уменьшить размер текста">A-</button>
+            <button id="normal-font" class="font-size-btn" aria-label="Нормальный размер текста">A</button>
+            <button id="increase-font" class="font-size-btn" aria-label="Увеличить размер текста">A+</button>
+        </div>
+    </div>
+    <div class="option-group">
+        <div class="option-group-title">ניווט</div>
+        <button id="large-cursor" class="filter-btn" aria-pressed="false" aria-label="Крупный курсор">
+            <div class="filter-icon" style="position: relative;">
+                <div style="position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; border: 2px solid black;"></div>
+            </div>
+            -->
+            סמן גדול
+        </button>
+    </div>
+    <div class="option-group">
+        <button id="reset-accessibility" aria-label="Сбросить все настройки доступности">אפס הגדרות</button>
+    </div>
+</div>
+<script>
+    let altlabel = document.querySelector('[href="#access"]');
+    if (altlabel) altlabel.classList.add("access");
+    if (document.querySelector(".access")) document.querySelector(".accessibility-toggle").style.display = "none";
+
+    const toggles = document.querySelectorAll(".accessibility-toggle, .access");
+    toggles.forEach(button => {
+        button.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const isExpanded = this.getAttribute("aria-expanded") === "true";
+            this.setAttribute("aria-expanded", !isExpanded);
+            document.querySelector(".accessibility-panel").classList.toggle("open");
+        });
+    });
+
+    document.addEventListener("click", function (event) {
+        const panel = document.querySelector(".accessibility-panel");
+        if (
+            panel.classList.contains("open") &&
+            !panel.contains(event.target) &&
+            !Array.from(toggles).some(btn => btn.contains(event.target))
+        ) {
+            panel.classList.remove("open");
+            toggles.forEach(btn => btn.setAttribute("aria-expanded", "false"));
+        }
+    });
+
+    let currentFontSizePercent = 100;
+
+    function loadSettings() {
+        const colorScheme = localStorage.getItem("accessibilityColorScheme");
+        if (colorScheme) {
+            document.body.classList.add("accessibility-" + colorScheme);
+            document.getElementById(colorScheme).classList.add("active");
+        }
+
+        const fontSizePercent = localStorage.getItem("accessibilityFontSizePercent") || "100";
+        if (fontSizePercent !== "100") {
+            updatePageFontSize(parseInt(fontSizePercent));
+        }
+
+        if (localStorage.getItem("accessibilityGrayscale") === "true") {
+            document.body.classList.add("accessibility-grayscale");
+            document.getElementById("grayscale").setAttribute("aria-pressed", "true");
+            document.getElementById("grayscale").classList.add("active");
+        }
+
+        if (localStorage.getItem("accessibilityInvert") === "true") {
+            document.body.classList.add("accessibility-invert");
+            document.getElementById("invert-colors").setAttribute("aria-pressed", "true");
+            document.getElementById("invert-colors").classList.add("active");
+        }
+
+        if (localStorage.getItem("accessibilityLargeCursor") === "true") {
+            document.body.classList.add("large-cursor");
+            document.getElementById("large-cursor").setAttribute("aria-pressed", "true");
+            document.getElementById("large-cursor").classList.add("active");
+        }
+
+        if (localStorage.getItem("accessibilityHideImages") === "true") {
+            document.body.classList.add("accessibility-hide-images");
+            document.getElementById("hide-images").classList.add("active");
+        } else {
+            document.getElementById("show-images").classList.add("active");
+        }
+    }
+
+    const colorSchemeButtons = document.querySelectorAll(".color-scheme-btn");
+    colorSchemeButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            if (this.classList.contains("active")) {
+                this.classList.remove("active");
+                const schemeId = this.id;
+                document.body.classList.remove("accessibility-" + schemeId);
+                localStorage.removeItem("accessibilityColorScheme");
+                return;
+            }
+
+            document.body.classList.remove(
+                "accessibility-black-on-white",
+                "accessibility-white-on-black",
+                "accessibility-brown-on-beige",
+                "accessibility-dark-blue-on-blue"
+            );
+
+            colorSchemeButtons.forEach(btn => btn.classList.remove("active"));
+
+            const schemeId = this.id;
+            document.body.classList.add("accessibility-" + schemeId);
+            this.classList.add("active");
+            localStorage.setItem("accessibilityColorScheme", schemeId);
+        });
+    });
+
+    function updatePageFontSize(percentSize) {
+        const ratio = percentSize / 100;
+        document.querySelectorAll('[data-elem-type="text"], .t-text, .t-name, .t-descr, .t-title, .t-subtitle, [field="text"], [field="title"], [field="subtitle"], [field="descr"]').forEach(el => {
+            el.style.transform = `scale(${ratio})`;
+        });
+        localStorage.setItem("accessibilityFontSizePercent", percentSize);
+    }
+
+    document.getElementById("decrease-font").addEventListener("click", function () {
+        currentFontSizePercent = Math.max(currentFontSizePercent - 10, 70);
+        updatePageFontSize(currentFontSizePercent);
+    });
+
+    document.getElementById("normal-font").addEventListener("click", function () {
+        currentFontSizePercent = 100;
+        updatePageFontSize(currentFontSizePercent);
+    });
+
+    document.getElementById("increase-font").addEventListener("click", function () {
+        currentFontSizePercent = Math.min(currentFontSizePercent + 10, 200);
+        updatePageFontSize(currentFontSizePercent);
+    });
+
+    document.getElementById("large-cursor").addEventListener("click", function () {
+        const isActive = this.getAttribute("aria-pressed") === "true";
+        this.setAttribute("aria-pressed", !isActive);
+        this.classList.toggle("active");
+        document.body.classList.toggle("large-cursor");
+        localStorage.setItem("accessibilityLargeCursor", !isActive);
+    });
+
+    document.getElementById("hide-images").addEventListener("click", function () {
+        document.body.classList.add("accessibility-hide-images");
+        document.getElementById("show-images").classList.remove("active");
+        this.classList.add("active");
+        localStorage.setItem("accessibilityHideImages", "true");
+    });
+
+    document.getElementById("show-images").addEventListener("click", function () {
+        document.body.classList.remove("accessibility-hide-images");
+        document.getElementById("hide-images").classList.remove("active");
+        this.classList.add("active");
+        localStorage.setItem("accessibilityHideImages", "false");
+    });
+
+    let speechSynthesis = window.speechSynthesis;
+    let speechUtterance = null;
+    let currentHighlightedElement = null;
+
+    document.getElementById("read-aloud").addEventListener("click", function () {
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+        }
+        if (currentHighlightedElement) {
+            currentHighlightedElement.classList.remove("accessibility-highlight-text");
+            currentHighlightedElement = null;
+        }
+        const textContent = document.querySelector('#allrecords').innerText;
+        if (!textContent || textContent.trim() === "") {
+            alert("Не найден текст для чтения");
+            return;
+        }
+        speechUtterance = new SpeechSynthesisUtterance(textContent);
+        let voices = speechSynthesis.getVoices();
+        let russianVoice = voices.find(voice => voice.lang.includes('ru'));
+        if (russianVoice) {
+            speechUtterance.voice = russianVoice;
+        }
+        speechUtterance.rate = 1;
+        speechUtterance.pitch = 1;
+        speechUtterance.volume = 1;
+        speechUtterance.onend = function () {
+            document.getElementById("stop-reading").classList.remove("active");
+            document.getElementById("read-aloud").classList.remove("active");
+        };
+        speechSynthesis.speak(speechUtterance);
+        document.getElementById("read-aloud").classList.add("active");
+        document.getElementById("stop-reading").classList.remove("active");
+    });
+
+    document.getElementById("stop-reading").addEventListener("click", function () {
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            if (currentHighlightedElement) {
+                currentHighlightedElement.classList.remove("accessibility-highlight-text");
+                currentHighlightedElement = null;
+            }
+            document.getElementById("read-aloud").classList.remove("active");
+            this.classList.add("active");
+        }
+    });
+
+    document.getElementById("reset-accessibility").addEventListener("click", function () {
+        document.body.classList.remove(
+            "accessibility-black-on-white",
+            "accessibility-white-on-black",
+            "accessibility-brown-on-beige",
+            "accessibility-dark-blue-on-blue",
+            "accessibility-grayscale",
+            "accessibility-invert",
+            "large-cursor",
+            "accessibility-hide-images"
+        );
+        document.querySelectorAll('[data-elem-type="text"], .t-text, [field="text"], [field="title"], [field="subtitle"], [field="descr"]').forEach(el => {
+            el.style.transform = "";
+        });
+        Array.from(document.body.children).forEach(el => {
+            if (!el.classList.contains("accessibility-panel")) {
+                el.style.transformOrigin = "";
+            }
+        });
+        document.querySelectorAll(".color-scheme-btn, .filter-btn, .font-size-btn").forEach(btn => {
+            btn.classList.remove("active");
+            if (btn.hasAttribute("aria-pressed")) {
+                btn.setAttribute("aria-pressed", "false");
+            }
+        });
+        currentFontSizePercent = 100;
+        if (speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            if (currentHighlightedElement) {
+                currentHighlightedElement.classList.remove("accessibility-highlight-text");
+                currentHighlightedElement = null;
+            }
+        }
+        localStorage.removeItem("accessibilityColorScheme");
+        localStorage.removeItem("accessibilityFontSizePercent");
+        localStorage.removeItem("accessibilityGrayscale");
+        localStorage.removeItem("accessibilityInvert");
+        localStorage.removeItem("accessibilityLargeCursor");
+        localStorage.removeItem("accessibilityHideImages");
+    });
+
+    window.addEventListener("DOMContentLoaded", function () {
+        const savedFontSize = localStorage.getItem("accessibilityFontSizePercent");
+        if (savedFontSize) {
+            currentFontSizePercent = parseInt(savedFontSize);
+        }
+        loadSettings();
+    });
+</script>
